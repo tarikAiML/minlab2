@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  # ---------- flask_app ----------
+  flask_app:
+    build: ./flask_app
+    container_name: flask_app
+    restart: always
+    environment:
+      - DATABASE_URL=postgresql://tarik:tarik@postgres:5432/minlab2_db
+    depends_on:
+      - postgres
+    networks:
+      - backend
+  # ---------- nginx ----------
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - flask_app
+    networks:
+      - backend
+  # ---------- postgres ----------
+  postgres:
+    image: postgres:13
+    restart: unless-stopped
+    container_name: postgres
+    environment:
+      POSTGRES_USER: tarik
+      POSTGRES_PASSWORD: tarik
+      POSTGRES_DB: minlab2_db
+    ports: ["5432:5432"]
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+  # ---------- pgAdmin ----------
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: unless-stopped
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports: ["8080:80"]
+    depends_on:
+      - postgres
+    volumes: [pgadmin_data:/var/lib/pgadmin]
+    networks:
+      - backend
+  # ---------- Portainer ----------
+  portainer:
+    image: portainer/portainer-ce
+    container_name: portainer
+    restart: unless-stopped
+    command: -H unix:///var/run/docker.sock
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      - backend
+
+volumes:
+  postgres_data:
+  portainer_data:
+  pgadmin_data:
+
+networks:
+  backend:
+
