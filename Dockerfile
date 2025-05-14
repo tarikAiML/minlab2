@@ -4,7 +4,6 @@ FROM python:3.10-slim
 # Définir le répertoire de travail
 WORKDIR /app
 
-
 # Copier les fichiers dans le conteneur
 COPY . .
 

@@ -8,13 +8,14 @@ services:
     restart: always
     environment:
       - DATABASE_URL=postgresql://tarik:tarik@postgres:5432/minlab2_db
+    ports: ["5000:5000"]
     depends_on:
       - postgres
     networks:
       - backend
   # ---------- nginx ----------
   nginx:
-    image: nginx:latest
+    image: nginx:1.20
     container_name: nginx
     ports:
       - "8080:80"
@@ -46,7 +47,7 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin
-    ports: ["8080:80"]
+    ports: ["8081:80"]
     depends_on:
       - postgres
     volumes: [pgadmin_data:/var/lib/pgadmin]
